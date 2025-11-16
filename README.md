@@ -139,7 +139,7 @@ Fordefi uses Threshold Signature Scheme (TSS) with Multi-Party Computation (MPC)
 
 ```mermaid
 graph TB
-    subgraph "Fordefi TSS/MPC (SECURE)"
+    subgraph "Fordefi TSS/MPC"
         B1[Share 1<br/>User's Mobile App] --> MPC[Multi-Party<br/>Computation]
         B2[Share 2<br/>API Signer] --> MPC
         B3[Share 3<br/>Fordefi Cloud] --> MPC
