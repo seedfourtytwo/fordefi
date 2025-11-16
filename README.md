@@ -81,6 +81,7 @@ docker run --rm --log-driver local \
 # 5. Create vault and transact
 python3 src/create_vault.py "My Vault"
 python3 src/send_token.py <vault_id> <recipient> <amount> <token> <chain_id>
+python3 src/wrap_eth.py <vault_id> <amount_wei>
 ```
 
 ## Setup
@@ -134,14 +135,28 @@ Register public key via API Signer menu for your API user.
 
 ## Usage
 
+### Create Vault
+
 ```bash
-# Create vault
+# Create EVM vault (default - works across all EVM chains)
 python3 src/create_vault.py "Vault Name"
 
-# Send tokens
-python3 src/send_token.py <vault_id> <recipient> <amount> <token_address> [chain_id]
+# Or specify vault type explicitly
+python3 -c "from src.create_vault import create_vault; create_vault('My Vault', vault_type='evm')"
 
-# Wrap ETH to WETH
+# Note: This assessment focuses on EVM vaults
+# Other types (bitcoin, solana, etc.) would require different vault_type parameter
+```
+
+### Send Tokens
+
+```bash
+python3 src/send_token.py <vault_id> <recipient> <amount> <token_address> [chain_id]
+```
+
+### Wrap ETH to WETH
+
+```bash
 python3 src/wrap_eth.py <vault_id> <amount_wei> [weth_address] [chain_id]
 ```
 

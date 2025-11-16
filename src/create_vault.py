@@ -13,7 +13,7 @@ from config import Config
 
 def create_vault(name, vault_type="evm"):
     """
-    Create a new EVM vault via Fordefi API.
+    Create a new vault via Fordefi API.
     
     Key concept: EVM vaults work across ALL EVM chains with a single address.
     The same vault address can be used on Ethereum, Unichain, Polygon, etc.
@@ -21,13 +21,21 @@ def create_vault(name, vault_type="evm"):
     
     Args:
         name: Human-readable name for the vault
-        vault_type: Type of vault (default: "evm" for EVM-compatible chains)
+        vault_type: Type of vault to create. Options:
+                   - "evm" (default): EVM-compatible chains (Ethereum, Polygon, etc.)
+                   - "bitcoin": Bitcoin vaults
+                   - "solana": Solana vaults
+                   - etc. (see Fordefi API docs for full list)
         
     Returns:
         dict: Vault object containing id, name, address, etc.
         
     Raises:
         requests.HTTPError: If API request fails
+        
+    Note:
+        This assessment focuses on EVM vaults. Other vault types follow
+        the same API pattern but may have different transaction structures.
     """
     # Validate configuration before making API calls
     Config.validate()
