@@ -9,6 +9,7 @@ Technical assessment for EVM vault operations and token transfers via Fordefi AP
 - [Quick Start](#quick-start)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Architecture](#architecture)
 - [Implementation Details](#implementation-details)
 - [Network Details](#network-details)
 - [References](#references)
@@ -83,6 +84,84 @@ python3 src/create_vault.py "My Vault"
 python3 src/send_token.py <vault_id> <recipient> <amount> <token> <chain_id>
 python3 src/wrap_eth.py <vault_id> <amount_wei>
 ```
+
+## Architecture
+
+### Transaction Flow
+
+The complete flow from Python script to blockchain confirmation:
+
+```mermaid
+sequenceDiagram
+    participant Script as Python Script
+    participant PrivKey as Private Key<br/>(ECDSA P-256)
+    participant API as Fordefi API
+    participant Signer as API Signer<br/>(Docker)
+    participant Shares as TSS Shares<br/>(Distributed)
+    participant Blockchain as EVM Blockchain
+
+    Note over Script,Blockchain: Step 1: Request Signing (API Authentication)
+    Script->>Script: Build transaction payload
+    Script->>PrivKey: Load private key (private.pem)
+    Script->>PrivKey: Sign request with ECDSA P-256
+    Note over Script,PrivKey: SHA256 hashing happens inside sign()
+    PrivKey-->>Script: Request signature
+
+    Note over Script,Blockchain: Step 2: API Submission
+    Script->>API: POST /api/v1/transactions<br/>(with signature header)
+    API->>API: Verify request signature
+    API->>API: Create transaction (pending)
+    API-->>Script: Transaction ID (pending state)
+    
+    Note over Script,Blockchain: Step 3: Transaction Approval (TSS)
+    API->>Signer: Notify: New transaction pending
+    Signer->>Signer: Evaluate approval policy
+    Signer->>Shares: Request signature shares
+    
+    Note over Shares: Each share holder signs independently
+    Note over Shares: Shares NEVER combine into full private key
+    
+    Shares-->>Signer: Return partial signatures
+    Signer->>Signer: Recombine shares using MPC
+    Note over Signer: TSS creates valid signature<br/>without reconstructing private key
+    Signer-->>API: Approved signature
+    
+    Note over Script,Blockchain: Step 4: Blockchain Submission
+    API->>Blockchain: Broadcast signed transaction
+    Blockchain->>Blockchain: Validate & include in block
+    Blockchain-->>API: Transaction hash
+    API-->>Script: Transaction confirmed
+```
+
+### TSS/MPC Security Model
+
+Fordefi uses Threshold Signature Scheme (TSS) with Multi-Party Computation (MPC) to sign transactions without ever reconstructing the full private key:
+
+```mermaid
+graph TB
+    subgraph "Fordefi TSS/MPC (SECURE)"
+        B1[Share 1<br/>Alice] --> MPC[Multi-Party<br/>Computation]
+        B2[Share 2<br/>Bob] --> MPC
+        B3[Share 3<br/>Charlie] --> MPC
+        MPC --> Partial1[Partial Sig 1]
+        MPC --> Partial2[Partial Sig 2]
+        MPC --> Partial3[Partial Sig 3]
+        Partial1 --> Combine2[Recombine<br/>Partial Sigs]
+        Partial2 --> Combine2
+        Partial3 --> Combine2
+        Combine2 --> Sig2[Valid Signature<br/>✅ Key Never Existed]
+    end
+    
+    style Sig2 fill:#51cf66
+    style MPC fill:#4dabf7
+```
+
+**Key Security Features:**
+- Vault private key is distributed as TSS shares
+- Each share holder computes partial signatures independently
+- Partial signatures combine into valid blockchain signature
+- Full private key **never exists in memory** at any point
+- Compromising one share doesn't grant access (with threshold ≥ 2)
 
 ## Setup
 

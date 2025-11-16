@@ -1,0 +1,15 @@
+graph TB
+    subgraph "Fordefi TSS/MPC (SECURE)"
+        B1[Share 1<br/>Alice] --> MPC[Multi-Party<br/>Computation]
+        B2[Share 2<br/>Bob] --> MPC
+        B3[Share 3<br/>Charlie] --> MPC
+        MPC --> Partial1[Partial Sig 1]
+        MPC --> Partial2[Partial Sig 2]
+        MPC --> Partial3[Partial Sig 3]
+        Partial1 --> Combine2[Recombine<br/>Partial Sigs]
+        Partial2 --> Combine2
+        Partial3 --> Combine2
+        Combine2 --> Sig2[Valid Signature<br/>✅ Key Never Existed]
+    end
+
+

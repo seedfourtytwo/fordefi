@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant Script as Python Script
+    participant PrivKey as Private Key<br/>(ECDSA P-256)
+    participant API as Fordefi API
+    participant Signer as API Signer<br/>(Docker)
+    participant Shares as TSS Shares<br/>(Distributed)
+    participant Blockchain as EVM Blockchain
+
+    Note over Script,Blockchain: Step 1: Request Signing (API Authentication)
+    Script->>Script: Build transaction payload
+    Script->>PrivKey: Load private key (private.pem)
+    Script->>PrivKey: Sign request with ECDSA P-256
+    Note over Script,PrivKey: SHA256 hashing happens inside sign()
+    PrivKey-->>Script: Request signature
+
+    Note over Script,Blockchain: Step 2: API Submission
+    Script->>API: POST /api/v1/transactions<br/>(with signature header)
+    API->>API: Verify request signature
+    API->>API: Create transaction (pending)
+    API-->>Script: Transaction ID (pending state)
+    
+    Note over Script,Blockchain: Step 3: Transaction Approval (TSS)
+    API->>Signer: Notify: New transaction pending
+    Signer->>Signer: Evaluate approval policy
+    Signer->>Shares: Request signature shares
+    
+    Note over Shares: Each share holder signs independently
+    Note over Shares: Shares NEVER combine into full private key
+    
+    Shares-->>Signer: Return partial signatures
+    Signer->>Signer: Recombine shares using MPC
+    Note over Signer: TSS creates valid signature<br/>without reconstructing private key
+    Signer-->>API: Approved signature
+    
+    Note over Script,Blockchain: Step 4: Blockchain Submission
+    API->>Blockchain: Broadcast signed transaction
+    Blockchain->>Blockchain: Validate & include in block
+    Blockchain-->>API: Transaction hash
+    API-->>Script: Transaction confirmed
+
