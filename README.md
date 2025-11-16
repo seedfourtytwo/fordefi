@@ -53,9 +53,11 @@ fordefi/
 **Task 2 - Sepolia ETH Wrapping:**
 - Vault ID: `646c57e4-bbb4-434f-855f-e0141a88265d`
 - Vault Address: `0xAcb22Ab21310bE639B4612219d87A64821A48Ec8`
-- Transaction ID: `eb4805cf-4cdb-42bc-98e0-6d954eef64d5`
+- Transaction Hash: `0x66549c7c08169888b2a70108d393c2f85bf3a7f2de3dbc585e4f5e78f1567e12`
+- Explorer: https://sepolia.etherscan.io/tx/0x66549c7c08169888b2a70108d393c2f85bf3a7f2de3dbc585e4f5e78f1567e12
 - Amount: 0.1 ETH wrapped to WETH
 - WETH Contract: `0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14`
+- Status: ✅ Confirmed (deposit() function called successfully)
 
 ## Quick Start
 
