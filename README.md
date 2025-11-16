@@ -140,12 +140,17 @@ Register public key via API Signer menu for your API user.
 ```bash
 # Create EVM vault (default - works across all EVM chains)
 python3 src/create_vault.py "Vault Name"
+```
 
-# Or specify vault type explicitly
-python3 -c "from src.create_vault import create_vault; create_vault('My Vault', vault_type='evm')"
+**Vault Types:**
+- `evm` (default): Works across all EVM chains (Ethereum, Polygon, Unichain, etc.)
+- `bitcoin`, `solana`: Other blockchain types (see Fordefi API docs)
+- This assessment focuses on EVM vaults
 
-# Note: This assessment focuses on EVM vaults
-# Other types (bitcoin, solana, etc.) would require different vault_type parameter
+**To specify vault type explicitly:**
+```python
+from src.create_vault import create_vault
+create_vault('My Vault', vault_type='evm')
 ```
 
 ### Send Tokens
