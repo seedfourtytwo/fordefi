@@ -10,6 +10,10 @@ private.pem
 # Credentials file
 CREDENTIALS.md
 
+# Interview notes (personal study material)
+INTERVIEW_NOTES.md
+*_NOTES.md
+
 # Python
 __pycache__/
 *.py[cod]
